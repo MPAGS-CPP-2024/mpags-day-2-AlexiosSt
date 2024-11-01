@@ -2,6 +2,31 @@
 #include <iostream>
 #include <string>
 #include <vector>
+using namespace std;
+
+std::string transformChar(const char in_char){
+    std::string out_char{""};
+
+    if (std::isalpha(in_char)) {
+        out_char = std::toupper(in_char);
+    }
+    else{
+        switch (in_char) {
+            case '0': out_char= "ZERO"; break;
+            case '1': out_char= "ONE";  break;
+            case '2': out_char= "TWO";  break;
+            case '3': out_char= "THREE";break;
+            case '4': out_char= "FOUR"; break;
+            case '5': out_char= "FIVE"; break;
+            case '6': out_char= "SIX";  break;
+            case '7': out_char= "SEVEN";break;
+            case '8': out_char= "EIGHT";break;
+            case '9': out_char= "NINE"; break;
+            default: break;
+        }
+    }
+    return out_char;
+ }
 
 int main(int argc, char* argv[])
 {
@@ -20,7 +45,7 @@ int main(int argc, char* argv[])
     for (std::size_t i{1}; i < nCmdLineArgs; ++i) {
         if (cmdLineArgs[i] == "-h" || cmdLineArgs[i] == "--help") {
             helpRequested = true;
-        } else if (cmdLineArgs[i] == "--version") {
+        } else if (cmdLineArgs[i] == "-v" || cmdLineArgs[i] == "--version") {
             versionRequested = true;
         } else if (cmdLineArgs[i] == "-i") {
             // Handle input file option
@@ -65,12 +90,11 @@ int main(int argc, char* argv[])
             << "Encrypts/Decrypts input alphanumeric text using classical ciphers\n\n"
             << "Available options:\n\n"
             << "  -h|--help        Print this help message and exit\n\n"
-            << "  --version        Print version information\n\n"
+            << "  -v|--version        Print version information\n\n"
             << "  -i FILE          Read text to be processed from FILE\n"
             << "                   Stdin will be used if not supplied\n\n"
             << "  -o FILE          Write processed text to FILE\n"
-            << "                   Stdout will be used if not supplied\n\n"
-            << std::endl;
+            << "                   Stdout will be used if not supplied\n\n";
         // Help requires no further action, so return from main
         // with 0 used to indicate success
         return 0;
@@ -80,7 +104,7 @@ int main(int argc, char* argv[])
     // Like help, requires no further action,
     // so return from main with zero to indicate success
     if (versionRequested) {
-        std::cout << "0.1.0" << std::endl;
+        std::cout << "2.0.0" << std::endl;
         return 0;
     }
 
@@ -95,49 +119,11 @@ int main(int argc, char* argv[])
                   << "') not implemented yet, using stdin\n";
     }
 
+    cout<<"HELLO... now give me some chars!\n";
+    cout<<"[INFO] Press ENTER and then Ctrl+D to terminate your input!!"<<endl;
     // loop over each character from user input
     while (std::cin >> inputChar) {
-        // Uppercase alphabetic characters
-        if (std::isalpha(inputChar)) {
-            inputText += std::toupper(inputChar);
-            continue;
-        }
-
-        // Transliterate digits to English words
-        switch (inputChar) {
-            case '0':
-                inputText += "ZERO";
-                break;
-            case '1':
-                inputText += "ONE";
-                break;
-            case '2':
-                inputText += "TWO";
-                break;
-            case '3':
-                inputText += "THREE";
-                break;
-            case '4':
-                inputText += "FOUR";
-                break;
-            case '5':
-                inputText += "FIVE";
-                break;
-            case '6':
-                inputText += "SIX";
-                break;
-            case '7':
-                inputText += "SEVEN";
-                break;
-            case '8':
-                inputText += "EIGHT";
-                break;
-            case '9':
-                inputText += "NINE";
-                break;
-        }
-
-        // If the character isn't alphabetic or numeric, DONT add it
+        inputText+=transformChar(inputChar);
     }
 
     // Print out the transliterated text
@@ -148,7 +134,9 @@ int main(int argc, char* argv[])
                   << "') not implemented yet, using stdout\n";
     }
 
+    cout<<"OK, you entered sth like:\n";
     std::cout << inputText << std::endl;
+    cout<<"====DONE!====\n";
 
     // No requirement to return from main, but we do so for clarity
     // and for consistency with other functions
