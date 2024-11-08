@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 #include "TransformChar.hpp"
 #include "ProcessCommandLine.hpp"
 using namespace std;
@@ -14,11 +15,11 @@ int main(int argc, char* argv[])
     // Options that might be set by the command-line arguments
     bool helpRequested{false};
     bool versionRequested{false};
-    std::string inputFile{""};
-    std::string outputFile{""};
+    std::string inputFileName{""};
+    std::string outputFileName{""};
     bool status{false};
 
-    status=processCommandLine(cmdLineArgs, helpRequested, versionRequested, inputFile, outputFile);
+    status=processCommandLine(cmdLineArgs, helpRequested, versionRequested, inputFileName, outputFileName);
     if (status){
         cout<<"Parsing of command line arguments was completed!!\n";
     }
@@ -56,28 +57,36 @@ int main(int argc, char* argv[])
 
     // Read in user input from stdin/file
     // Warn that input file option not yet implemented
-    if (!inputFile.empty()) {
-        std::cerr << "[warning] input from file ('" << inputFile
-                  << "') not implemented yet, using stdin\n";
+    if (!inputFileName.empty()) {
+        std::cout << "Input from file ('" << inputFileName
+                  << "') started!\n";
+        ifstream inFile{inputFileName};
+        while (inFile>>inputChar){
+            inputText+=transformChar(inputChar);
+        }
+        inFile.close();
     }
-
-    cout<<"HELLO... now give me some chars!\n";
-    cout<<"[INFO] Press ENTER and then Ctrl+D to terminate your input!!"<<endl;
-    // loop over each character from user input
-    while (std::cin >> inputChar) {
-        inputText+=transformChar(inputChar);
+    else{   cout<<"HELLO... now give me some chars!\n";
+        cout<<"[INFO] Press ENTER and then Ctrl+D to terminate your input!!"<<endl;
+        // loop over each character from user input
+        while (std::cin >> inputChar) {
+            inputText+=transformChar(inputChar);
+        }
     }
-
-    // Print out the transliterated text
+    
+    // NOW: Print out the transliterated text
 
     // Warn that output file option not yet implemented
-    if (!outputFile.empty()) {
-        std::cerr << "[warning] output to file ('" << outputFile
-                  << "') not implemented yet, using stdout\n";
+    if (!outputFileName.empty()) {
+        std::cout << "Writing output to file ('" << outputFileName
+                  << "') started!\n";
+        ofstream outFile{outputFileName};
+        outFile<<inputText;
     }
-
-    cout<<"OK, you entered sth like:\n";
-    std::cout << inputText << std::endl;
+    else{cout<<"OK, you entered sth like:\n";
+        std::cout << inputText << std::endl;
+    }
+    
     cout<<"====DONE!====\n";
 
     // No requirement to return from main, but we do so for clarity
