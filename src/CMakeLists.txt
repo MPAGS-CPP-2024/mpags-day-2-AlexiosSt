@@ -10,7 +10,10 @@ add_executable(mpags-cipher
     MPAGSCipher/TransformChar.cpp
     MPAGSCipher/TransformChar.hpp
     MPAGSCipher/ProcessCommandLine.cpp
-    MPAGSCipher/ProcessCommandLine.hpp)
+    MPAGSCipher/ProcessCommandLine.hpp
+    MPAGSCipher/RunCaesarCipher.cpp
+    MPAGSCipher/RunCaesarCipher.hpp
+    )
 
 target_include_directories(mpags-cipher 
     PRIVATE MPAGSCipher)

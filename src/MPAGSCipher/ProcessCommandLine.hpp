@@ -5,6 +5,7 @@
 #include <vector>
 
 bool processCommandLine(const std::vector<std::string>& ,
-    bool& , bool& , std::string& , std::string& );
+    bool& , bool& , std::string& , std::string& ,
+    bool& , std::string&);
 
 #endif

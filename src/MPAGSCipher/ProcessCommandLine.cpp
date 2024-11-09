@@ -1,10 +1,11 @@
-#include <iostream>
 #include "ProcessCommandLine.hpp"
+#include <iostream>
 using namespace std;
 
 bool processCommandLine(const vector<string>& args,
     bool& helpRequested, bool& versionRequested,
-    string& inputFileName, string& outputFileName){
+    string& inputFileName, string& outputFileName,
+    bool& encrypt, string& key){
     
      // Status flag to indicate whether or not the parsing was successful
     bool processStatus{true};
@@ -45,7 +46,27 @@ bool processCommandLine(const vector<string>& args,
                 outputFileName = args[i + 1];
                 ++i;
             }
-        } else {
+        }
+        else if(args[i] == "-k"){
+            if (i == nargs - 1){
+                std::cerr << "[error] -k requires an unsigned integer as the cipher key argument"
+                          << std::endl;
+                // exit main with non-zero return to indicate failure
+                processStatus=false;
+                break;
+            }
+            else {
+                key=args[i+1];
+                ++i;
+            }
+        }
+        else if(args[i] == "--encrypt"){
+                encrypt=true;
+        }
+        else if (args[i]=="--decrypt"){
+                encrypt=false;
+        }
+        else {
             // Have an unknown flag to output error message and return non-zero
             // exit status to indicate failure
             std::cerr << "[error] unknown argument '" << args[i]

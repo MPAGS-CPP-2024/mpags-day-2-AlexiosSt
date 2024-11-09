@@ -1,10 +1,11 @@
+#include "TransformChar.hpp"
+#include "ProcessCommandLine.hpp"
+#include "RunCaesarCipher.hpp"
 #include <cctype>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
-#include "TransformChar.hpp"
-#include "ProcessCommandLine.hpp"
 using namespace std;
 
 int main(int argc, char* argv[])
@@ -15,13 +16,15 @@ int main(int argc, char* argv[])
     // Options that might be set by the command-line arguments
     bool helpRequested{false};
     bool versionRequested{false};
+    bool encrypt{true};
+    string cipherKey{""};
     std::string inputFileName{""};
     std::string outputFileName{""};
     bool status{false};
 
-    status=processCommandLine(cmdLineArgs, helpRequested, versionRequested, inputFileName, outputFileName);
+    status=processCommandLine(cmdLineArgs, helpRequested, versionRequested, inputFileName, outputFileName, encrypt, cipherKey);
     if (status){
-        cout<<"Parsing of command line arguments was completed!!\n";
+        cout<<"Parsing of command line arguments was completed!!\n\n";
     }
     else return 1;
 
@@ -29,15 +32,19 @@ int main(int argc, char* argv[])
     if (helpRequested) {
         // Line splitting for readability
         std::cout
-            << "Usage: mpags-cipher [-h/--help] [--version] [-i <file>] [-o <file>]\n\n"
+            << "Usage: mpags-cipher [-h/--help] [--version] [-i <file>] [-o <file>] [-k <key>] [--encrypt/--decrypt]\n\n"
             << "Encrypts/Decrypts input alphanumeric text using classical ciphers\n\n"
-            << "Available options:\n\n"
-            << "  -h|--help        Print this help message and exit\n\n"
-            << "  -v|--version     Print version information\n\n"
+            << "Available options:\n"
+            << "  -h|--help        Print this help message and exit\n"
+            << "  -v|--version     Print version information\n"
             << "  -i FILE          Read text to be processed from FILE\n"
-            << "                   Stdin will be used if not supplied\n\n"
+            << "                   Stdin will be used if not supplied\n"
             << "  -o FILE          Write processed text to FILE\n"
-            << "                   Stdout will be used if not supplied\n\n";
+            << "                   Stdout will be used if not supplied\n"
+            << "  -k KEY           The Key (must be unsigned long!) to be used for en/decryption\n"
+            << "                   Null key, i.e. no encryption, will be used if not supplied\n"
+            << "  --encrypt        If we are encrypting the input text (default)\n"
+            << "  --decrypt        If we are decrypting the input text\n\n";
         // Help requires no further action, so return from main
         // with 0 used to indicate success
         return 0;
@@ -47,7 +54,7 @@ int main(int argc, char* argv[])
     // Like help, requires no further action,
     // so return from main with zero to indicate success
     if (versionRequested) {
-        std::cout << "2.0.0" << std::endl;
+        std::cout << "2.3.0" << std::endl;
         return 0;
     }
 
@@ -61,6 +68,10 @@ int main(int argc, char* argv[])
         std::cout << "Input from file ('" << inputFileName
                   << "') started!\n";
         ifstream inFile{inputFileName};
+        if (!inFile.good()){
+            cerr<<"[error] Could not open the input file '"<<inputFileName<<"' !!\n";
+            return 1;
+        }
         while (inFile>>inputChar){
             inputText+=transformChar(inputChar);
         }
@@ -73,21 +84,46 @@ int main(int argc, char* argv[])
             inputText+=transformChar(inputChar);
         }
     }
+    cout<<"==DONE with input transliteration!==\n";
     
-    // NOW: Print out the transliterated text
+    // NOW: we do the en/decryption on the transliterated text
+    //first check the KEY!
+    std::size_t caesarKey{0};
+    if (!cipherKey.empty()) {
+        for (const auto& elem : cipherKey) {
+            if (!std::isdigit(elem)) {
+                std::cerr
+                    << "[error] cipher key must be an unsigned long integer for Caesar cipher,\n"
+                    << "        the supplied key (" << cipherKey
+                    << ") could not be successfully converted" << std::endl;
+                return 1;
+            }
+        }
+        caesarKey = std::stoul(cipherKey);
+    }
+
+    string outputText{""};
+    outputText = runCaesarCipher(inputText, caesarKey, encrypt);
 
     // Warn that output file option not yet implemented
     if (!outputFileName.empty()) {
         std::cout << "Writing output to file ('" << outputFileName
                   << "') started!\n";
         ofstream outFile{outputFileName};
-        outFile<<inputText;
+        if (!outFile.good()){
+            cerr<<"[error] The output file '"<<outputFileName<<"' could not be opened!\n";
+            return 1;
+        }
+        outFile<<outputText;
     }
-    else{cout<<"OK, you entered sth like:\n";
-        std::cout << inputText << std::endl;
+    else{cout<<"OK, your text after the cipher has been run is sth like:\n";
+        std::cout << outputText << std::endl;
     }
     
-    cout<<"====DONE!====\n";
+    cout<<"==DONE with the ";
+    if (encrypt) cout<<"encryption ";
+    else cout<<"decryption ";
+    cout<<"of your input==\n";
 
     // No requirement to return from main, but we do so for clarity
     // and for consistency with other functions

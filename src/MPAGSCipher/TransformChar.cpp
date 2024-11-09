@@ -1,6 +1,5 @@
-#include <cctype>
-#include <string>
 #include "TransformChar.hpp"
+#include <cctype>
 
 std::string transformChar(const char in_char){
     std::string out_char{""};
