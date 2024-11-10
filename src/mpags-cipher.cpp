@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
             << "                   Stdin will be used if not supplied\n"
             << "  -o FILE          Write processed text to FILE\n"
             << "                   Stdout will be used if not supplied\n"
-            << "  -k KEY           The Key (must be unsigned long!) to be used for en/decryption\n"
+            << "  -k KEY           The Key (must be unsigned long integer!) to be used for en/decryption\n"
             << "                   Null key, i.e. no encryption, will be used if not supplied\n"
             << "  --encrypt        If we are encrypting the input text (default)\n"
             << "  --decrypt        If we are decrypting the input text\n\n";
@@ -100,8 +100,10 @@ int main(int argc, char* argv[])
             }
         }
         caesarKey = std::stoul(cipherKey);
+        if (caesarKey>1000) {std::cerr<<"[error] Hey, relax... The key doesn't need to be higher than 1000!!\n";
+            return 1;}
     }
-
+    
     string outputText{""};
     outputText = runCaesarCipher(inputText, caesarKey, encrypt);
 
