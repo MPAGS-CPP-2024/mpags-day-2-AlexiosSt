@@ -20,8 +20,8 @@ int main(int argc, char* argv[])
     string cipherKey{""};
     std::string inputFileName{""};
     std::string outputFileName{""};
-    bool status{false};
 
+    bool status{false};
     status=processCommandLine(cmdLineArgs, helpRequested, versionRequested, inputFileName, outputFileName, encrypt, cipherKey);
     if (status){
         cout<<"Parsing of command line arguments was completed!!\n\n";
@@ -63,7 +63,6 @@ int main(int argc, char* argv[])
     std::string inputText;
 
     // Read in user input from stdin/file
-    // Warn that input file option not yet implemented
     if (!inputFileName.empty()) {
         std::cout << "Input from file ('" << inputFileName
                   << "') started!\n";
@@ -87,7 +86,7 @@ int main(int argc, char* argv[])
     cout<<"==DONE with input transliteration!==\n";
     
     // NOW: we do the en/decryption on the transliterated text
-    //first check the KEY!
+    // First check the KEY!
     std::size_t caesarKey{0};
     if (!cipherKey.empty()) {
         for (const auto& elem : cipherKey) {
@@ -103,11 +102,11 @@ int main(int argc, char* argv[])
         if (caesarKey>1000) {std::cerr<<"[error] Hey, relax... The key doesn't need to be higher than 1000!!\n";
             return 1;}
     }
-    
+
     string outputText{""};
     outputText = runCaesarCipher(inputText, caesarKey, encrypt);
 
-    // Warn that output file option not yet implemented
+    // Use output file option if supplied
     if (!outputFileName.empty()) {
         std::cout << "Writing output to file ('" << outputFileName
                   << "') started!\n";
